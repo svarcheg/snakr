@@ -1,0 +1,218 @@
+* Setup
+** setup the IDE
+
+*** Install intellij 
+https://www.jetbrains.com/idea/download/#section=windows
+
+*** Install Rust plugin in Intellij 
+File -> Settings -> Plugins -> Rust -> Install
+
+Also install Toml plugin
+
+*** Restart Intellij 
+
+** Install Rust
+
+*** Install rustup 
+
+https://win.rustup.rs/
+
+
+more details here: https://www.rust-lang.org/learn/get-started
+
+if proxy problems kets try the following: https://stackoverflow.com/questions/42843329/how-can-i-install-rust-using-rustup-on-windows-when-behind-a-firewall
+
+*** Install WebAssembly target 
+The WebAssembly compilation target is not shipped by default, but you can add it like so:
+#+BEGIN_SRC shell
+  rustup target add wasm32-unknown-unknown
+#+END_SRC
+
+*** setup proxy (hopefully we wont need to do that ..)
+https://doc.rust-lang.org/cargo/reference/config.html
+
+create a file in C:\Users\<user>\.cargo\config
+
+and enter 
+
+#+BEGIN_SRC text
+  [http]
+  proxy = "proxy.ullink.lan:9876"
+#+END_SRC
+
+*** Install cargo-web 
+cargo-web handles everything you need to ship your game on the web. Install it like so:
+#+BEGIN_SRC shell
+  cargo install cargo-web
+#+END_SRC
+
+** Install git (optional)
+https://git-scm.com/download/win
+
+
+* Kick start
+** create the project 
+#+BEGIN_SRC shell
+  cargo new --vcs git snakr
+#+END_SRC
+
+If the setup is done well you should be able to do the following: 
+
+#+BEGIN_SRC shell
+cd snakr
+cargo run --release
+#+END_SRC
+
+and see this: 
+#+BEGIN_SRC shell
+  C:\Users\vlad\Documents\src\snakr>cargo run
+     Compiling snakr v0.1.0 (C:\Users\vlad\Documents\src\snakr)
+      Finished dev [unoptimized + debuginfo] target(s) in 0.64s
+       Running `target\debug\snakr.exe`
+  Hello, world!
+
+  C:\Users\vlad\Documents\src\snakr>
+#+END_SRC
+
+** open the project in IDE 
+File -> Open -> snakr
+
+** setup libraries
+
+Open Cargo.toml file in the project and add the following: 
+#+BEGIN_SRC text
+  [dependencies]
+  quicksilver = "0.3.20"
+  nalgebra = "0.19.0"
+  ncollide2d = "0.21.0"
+  rand = "0.7.2"
+  num = "0.2.0"
+#+END_SRC
+
+not all are needed but still.
+
+execute 
+
+#+BEGIN_SRC text
+cargo build
+#+END_SRC
+
+* Language presentation
+** Fast (really)
+** No GC 
+** strongly typed
+** zero cost abstractions
+** has functional features (map, reduce, pattern matching etc)
+** Few useful to know constructs for java experts 
+*** use use instead of import and :: nstead of . 
+ex: 
+#+BEGIN_SRC text 
+  use rand::Rng;
+#+END_SRC
+
+IDE will help you (to some extent)
+
+*** basic types
+- i32
+- u32
+- i8
+- tuples, ex : (i32, i32)
+- vectors (resizable array)
+- hash maps
+- enums
+- bool
+
+*** no classes, but structs + traits
+Example: 
+
+#+BEGIN_SRC c
+  struct Popo {
+  a: i32,
+  b: i32
+  }
+
+  impl Popo {
+    fn do_stuff(&mut self, x : i32) -> i32 {
+      self.a + x // if no ; at the end of last line the value is returned
+    }
+  }
+#+END_SRC
+
+*** simple flow control 
+#+BEGIN_SRC c
+  if a == b  {
+    zob();
+  }
+
+  for i in 0..5 {
+    zob();
+  }
+#+END_SRC
+
+*** collections are iterable
+*** ownership and references
+too complex to write will just try to explain it
+*** I probably forgot a lot but let's just code!
+* Snakr
+** quicksilver docs
+https://docs.rs/crate/quicksilver/0.3.20
+
+** create the game skeleton
+open main.rs and add the following
+#+BEGIN_SRC c
+  use quicksilver::{
+      Result,
+      geom::{Circle, Line, Rectangle, Transform, Triangle, Vector, Shape},
+      graphics::{Background::Col,Background::Img,  Color},
+      lifecycle::{Settings, State, Window, run},
+      combinators::Future
+  };
+  use rand::Rng;
+  use quicksilver::prelude::{Key, Event, Font, FontStyle, Image};
+  use quicksilver::input::ButtonState;
+  use quicksilver::lifecycle::Asset;
+
+
+  struct Game;
+
+  impl State for Game {
+      /// Load the assets and initialise the game
+      fn new() -> Result<Self> {
+          Ok(Self)
+      }
+
+      /// Process keyboard and mouse, update the game state
+      fn update(&mut self, window: &mut Window) -> Result<()> {
+          Ok(())
+      }
+
+      /// Draw stuff on the screen
+      fn draw(&mut self, window: &mut Window) -> Result<()> {
+          Ok(())
+      }
+  }
+
+
+  fn main() {
+      run::<Game>("Snakr", Vector::new(450, 450), Settings{update_rate : 200.0, ..Settings::default()});
+  }
+#+END_SRC
+
+and then add following into draw function: 
+
+#+BEGIN_SRC c
+  window.draw(&Rectangle::new((100, 100), (15, 15)), Col(Color::from_rgba(0, 0, 255, 0.7)));
+#+END_SRC
+
+** run it
+*** in windows / linux 
+#+BEGIN_SRC shell
+cargo run
+#+END_SRC
+
+*** in browser
+#+BEGIN_SRC shell
+  cargo web start --auto-reload
+#+END_SRC
+
+* You have 45 mins left, good luck ! 
